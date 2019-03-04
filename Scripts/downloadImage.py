@@ -6,15 +6,15 @@ import urllib2
 from PIL import Image
  
 # Set the directory where you want to save your photos
-save_path='G:\MCA Project\ImagesCollected\Dress'
+save_path='G:\MCA Project\data\ImagesCollected\Dress'
 
 def checkImageValid(filename):
     try:
         img = Image.open(filename) # open the image file
         img.verify() # verify that it is, in fact an image
-        print "Valid"
+        print "."
     except (IOError, SyntaxError) as e:
-        print ("Deleted the corrupted image")
+        print ("?")
         os.remove(filename)
 
 def getDataFromUrl(url):
@@ -27,7 +27,7 @@ def getDataFromUrl(url):
                 filePath=os.path.join(save_path,filename)   
                 tempFile=open(filePath, 'wb')
                 tempFile.write(r.content) 
-                print "Saved Images"
+                print "Saved Successfully"
             else:
                 print "Unable to download"
         else:
@@ -86,17 +86,19 @@ def deleteCorruptFiles():
     for file in path:
         checkImageValid(save_path+'/'+file)
 
-def deleteDuplicateFiles(){
+def deleteDuplicateFiles():
     duplicates=findDup(save_path)
     if len(duplicates)>0:
         for item in duplicates:
             os.remove(item)  
-}
 
 def main():
     printFileContent()
+    print "Deleting the Corrupt Files"
     deleteCorruptFiles()
+    print "Deleting the Duplicate Files"
     deleteDuplicateFiles()
+    print "Process Done"
     
 if __name__=="__main__":
     main()
