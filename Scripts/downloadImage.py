@@ -4,9 +4,13 @@ import requests
 import validators
 import urllib2
 from PIL import Image
- 
+import sys
+downloadCounter=0
+downloadFailCounter=0
+
 # Set the directory where you want to save your photos
-save_path='G:\MCA Project\data\ImagesCollected\Dress'
+save_path='G:\MCA Project\data\ImagesCollected\Outerwear'
+fileNotDownloadedPath='G:/MCA Project/data/ImagesCollected/Outerwear/NotDownloaded'
 
 def checkImageValid(filename):
     try:
@@ -26,9 +30,17 @@ def getDataFromUrl(url):
             if r.status_code==200:
                 filePath=os.path.join(save_path,filename)   
                 tempFile=open(filePath, 'wb')
-                tempFile.write(r.content) 
-                print "Saved Successfully"
+                tempFile.write(r.content)
+                global downloadCounter
+                downloadCounter+=1
+                print('Download Count %d and Download Fail Count is %d' %(downloadCounter, downloadFailCounter))
             else:
+                global downloadFailCounter
+                downloadFailCounter+=1
+                filePath=fileNotDownloadedPath+'/notDownloadedPhotoUrls.txt'
+                f=open(filePath,"a")
+                message=save_path.split("\'")[-1]+',Url: '+url
+                f.write(message+"\n")
                 print "Unable to download"
         else:
             print "Invalid"
@@ -37,18 +49,23 @@ def getDataFromUrl(url):
    
 
 def printFileContent():
-    # dirs=os.getcwd()
-    for root, directories, filenames in os.walk('G:\MCA Project\celebrityImages\Dress'):
+    # Change the dir path for each folder separately
+    for root, directories, filenames in os.walk('G:\MCA Project\celebrityImages\Outerwear'):
         for directory in directories:
             directory_path = os.path.join(root, directory)
         
         for filename in filenames:
+            print filename
             file_path = os.path.join(root,filename)
+            print file_path
             if(os.path.isfile(file_path)):
-                openFile=open(file_path,'r').readlines()
-                for line in openFile:
-                    line=line.rstrip().split('?')[0]
-                    getDataFromUrl(line)
+                try:
+                    openFile=open(file_path,'r').readlines()
+                    for line in openFile:
+                        line=line.rstrip().split('?')[0]
+                        getDataFromUrl(line)
+                except IOError as e:
+                    print "I/O error({0}): {1}".format(e.errno, e.strerror)
             else:
                 print "Not a file"
 
@@ -94,11 +111,12 @@ def deleteDuplicateFiles():
 
 def main():
     printFileContent()
-    print "Deleting the Corrupt Files"
-    deleteCorruptFiles()
-    print "Deleting the Duplicate Files"
-    deleteDuplicateFiles()
-    print "Process Done"
+    print "Download Completed"
+    # print "Deleting the Corrupt Files"
+    # deleteCorruptFiles()
+    # print "Deleting the Duplicate Files"
+    # deleteDuplicateFiles()
+    # print "Process Done"
     
 if __name__=="__main__":
     main()
