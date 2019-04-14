@@ -1,8 +1,11 @@
 import re
 import pandas as pd
 import numpy as np
+from numpy import array
+from numpy import argmax
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
 import matplotlib.pyplot as plt
-import seaborn as sns
 import requests
 import validators
 from bs4 import BeautifulSoup
@@ -10,11 +13,13 @@ import csv
 import os
 import sys
 
-csvPath='G:\MCA Project\data'
-dirPath='G:/MCA Project/bodyMeasurements'
+csvPath='D:\others\MCA\BodyMeasurementOutput'
+dirPath='D:\others\MCA\Input'
 
-# headers=[['Name','dress size','Breasts-Waist-Hips(m)','Shoe/Feet','Bra size','Cup size','Height(m)','Weight(kg)','Natural breasts or implants?','Bust Circumference(m)','Waist Circumference(m)','Hip Circumference(m)','Bust/Hip','Waist/Hip','Bust/Waist','Bust-Hip(m)','Waist-Hip(m)','Bust-Waist(m)','BMI(kg/m2)','BSI']]
+
+# headers=[['Name','body Shape','dress size','Breasts-Waist-Hips(m)','Shoe/Feet','Bra size','Cup size','Height(m)','Weight(kg)','Natural breasts or implants?','Bust Circumference(m)','Waist Circumference(m)','Hip Circumference(m)','Bust/Hip','Waist/Hip','Bust/Waist','Bust-Hip(m)','Waist-Hip(m)','Bust-Waist(m)','BMI(kg/m2)','BSI']]
 headers=[['Name','body Shape','dress size','Breasts-Waist-Hips(m)','Shoe/Feet','Bra size','Cup size','Height(m)','Weight(kg)','Natural breasts or implants?']]
+
 
 
 def cmToM(val):
@@ -28,28 +33,13 @@ def inchesToM(val):
     return g
       
 def poundsToKg(val):
-    print val
     res=float(val)/2.2
-    print res
     g = float("{0:.3f}".format(res))
     return g
 
-def calculateBMI(bodyWeight,height):
-    heightSq=height*height
-    bmi=bodyWeight/heightSq
-    return bmi
-
-def calculateRatio(val1,val2):
-    return int(val1)/int(val2)
-
-def calculateDifference(val1,val2):
-    return val1-val2
-
-def calculateBSI():
-    print "To be done"
 
 def init():
-    filename=csvPath+'/'+'bodydata.csv'
+    filename=csvPath+'/'+'testData.csv'
     with open(filename, 'w') as writeFile:
         writer = csv.writer(writeFile)
         lines = list(headers)
@@ -57,25 +47,25 @@ def init():
     writeFile.close()
 
 def updateCsvFile(row):
-    filename=csvPath+'/'+'bodydata.csv'
+    filename=csvPath+'/'+'testData.csv'
     try:
         with open(filename, 'a') as csvFile:
             writer = csv.writer(csvFile)
             writer.writerow(row)
         csvFile.close()
     except IOError as e:
-        print "I/O error({0}): {1}".format(e.errno, e.strerror)
+        print("I/O error({0}): {1}".format(e.errno, e.strerror))
     except: #handle other exceptions such as attribute errors
-        print "Unexpected error:", sys.exc_info()[0]
+        print("Unexpected error:", sys.exc_info()[0])
 
 
 def getData(url):
     try:
         res=validators.url(url)
         if res!='none':
-            print "Requesting...."
+            print("Requesting....")
             html =  r = requests.get(url)
-            print "Response received"
+            print("Response received")
             soup = BeautifulSoup(html.text, 'lxml')
 
             titles = soup.find_all('h1')
@@ -102,7 +92,7 @@ def getData(url):
                         values.append(height)
                     except IndexError:
                         values.append("Null")
-                        print "Out of index Error"
+                        print("Out of index Error")
                 elif(val=='Weight'):
                     try:
                         weight=i.split(',')[1].split(']')[0].split('(')[1].split(' ')[0]
@@ -110,7 +100,7 @@ def getData(url):
                         values.append(weight)
                     except IndexError:
                         values.append("Null")
-                        print "Out of index Error"
+                        print("Out of index Error")
                 elif(val=='Breasts-Waist-Hips'):
                     try:
                         BWH=i.split(',')[1].split(']')[0].split('(')[1].split(' ')[0]
@@ -121,18 +111,18 @@ def getData(url):
                         values.append(res)
                     except IndexError:
                         values.append("Null")
-                        print "Out of index Error"
+                        print("Out of index Error")
                 else:
                     try:
                       values.append(i.split(',')[1].split(']')[0].split('(')[0])
                     except IndexError:
                         values.append("Null")
-                        print "Out of index Error"
+                        print("Out of index Error")
             updateCsvFile(values)
         else:
-            print "Invalid"
+            print("Invalid")
     except (IOError, SyntaxError) as e:
-        print e
+        print(e)
 
 
 def parseFiles():
@@ -146,17 +136,17 @@ def parseFiles():
                     line=line.rstrip()
                     getData(line)
             except IOError as e:
-                print "I/O error({0}): {1}".format(e.errno, e.strerror)
+                print("I/O error({0}): {1}".format(e.errno, e.strerror))
             except: #handle other exceptions such as attribute errors
-                print "Unexpected error:", sys.exc_info()[0]
+                print("Unexpected error:", sys.exc_info()[0])
         else:
-            print "Not a file"
+            print("Not a file")
 
 def main():
     init()
-    print "Process Started"
+    print("Process Started")
     parseFiles()
-    print "Process Ended"
+    print("Process Ended")
 
 if __name__ == "__main__":
     main()

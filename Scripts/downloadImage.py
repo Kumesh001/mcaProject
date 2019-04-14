@@ -9,8 +9,8 @@ downloadCounter=0
 downloadFailCounter=0
 
 # Set the directory where you want to save your photos
-save_path='G:\MCA Project\data\ImagesCollected\Outerwear'
-fileNotDownloadedPath='G:/MCA Project/data/ImagesCollected/Outerwear/NotDownloaded'
+save_path='G:\MCA Project\data\ImagesCollected\Skirt'
+fileNotDownloadedPath='G:/MCA Project/data/ImagesCollected/Skirt/NotDownloaded'
 
 def checkImageValid(filename):
     try:
@@ -50,7 +50,7 @@ def getDataFromUrl(url):
 
 def printFileContent():
     # Change the dir path for each folder separately
-    for root, directories, filenames in os.walk('G:\MCA Project\celebrityImages\Outerwear'):
+    for root, directories, filenames in os.walk('G:\MCA Project\celebrityImages\TempFolder'):
         for directory in directories:
             directory_path = os.path.join(root, directory)
         
@@ -62,7 +62,10 @@ def printFileContent():
                 try:
                     openFile=open(file_path,'r').readlines()
                     for line in openFile:
-                        line=line.rstrip().split('?')[0]
+                        line=line.split(",")[1].split(":")
+                        line=line[1]+":"+line[2]
+                        print line
+                        # line=line.rstrip().split('?')[0]
                         getDataFromUrl(line)
                 except IOError as e:
                     print "I/O error({0}): {1}".format(e.errno, e.strerror)
