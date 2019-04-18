@@ -192,7 +192,7 @@ def parseInputDatafile():
         print(inputFilePath)
         with open(inputFilePath) as f:
             reader = csv.reader(f)
-            # first_row = next(reader)
+            first_row = next(reader)
             for row in reader:
                 print(row)
                 if len(row[0])!=0:
