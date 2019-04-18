@@ -10,25 +10,22 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelBinarizer
 
-inputFilePath='D:/others/MCA/BodyMeasurementOutput/bodydata.csv'
-outputFilePath='D:/others/MCA/BodyMeasurementOutput'
+inputFilePath='G:/MCA Project/mcaProject/data/bodydata.csv'
+outputFilePath='G:/MCA Project/mcaProject/data'
 
 #Breast type (Natural or Implant)
-headers=[['Height','Mass','Bust Circumference','Waist Circumference','Hip Circumference','B:W:H','B:H','W:H','B:W','B-H','W-H','B-W','BMI','BSI','Feet','AA','A','B','C','D','DD','E','DDD','F','DDDD','G','H','I','J','K','L','M','N','O','P','Q','R','FF','30A','32A','34A','36A','38A','40A','30B','32B','34B','36B','38B','40B','30C','32C','34C','36C','38C','40C','30D','32D','34D','36D','38D','40D','34DD','32AA','36DD','32DD','38DDD','40DD','34FF','36E','38E','32F','38F','30G','Naturals or Implants']]
-print(len(headers[0]))
+headers=[['Name','Height','Mass','Bust Circumference','Waist Circumference','Hip Circumference','B:W:H','B:H','W:H','B:W','B-H','W-H','B-W','BMI','BSI','Feet','AA','A','B','C','D','DD','E','DDD','F','DDDD','G','H','I','J','K','L','M','N','O','P','Q','R','FF','30A','32A','34A','36A','38A','40A','30B','32B','34B','36B','38B','40B','30C','32C','34C','36C','38C','40C','30D','32D','34D','36D','38D','40D','34DD','32AA','36DD','32DD','38DDD','40DD','34FF','36E','38E','32F','38F','30G','Naturals or Implants']]
 # <   (in Inches) 
 differenceBustAndBand=[1,1,	2,	3,	4,	5,	6,	7,	8,	9,	10,	11,	12,	13,	14,	15,	16,	17,	18]
 
 # Length 19
 cupSizeUS=["AA","A","B","C","D","DD","E","DDD","F","DDDD","G","H","I","J","K","L","M","N","O","P","Q","R","FF"]
-print(len(cupSizeUS))
 
 # Length 20
 braSizeUS=["30A","32A","34A","36A","38A","40A","30B","32B","34B","36B","38B","40B","30C","32C","34C","36C","38C","40C","30D","32D","34D","36D","38D","40D","34DD","32AA","36DD","32DD","38DDD","40DD","34FF","36E","38E","32F","38F","30G"]
-print(len(braSizeUS))
 # length 2
 breastType=["Natural","Implants"]
-print(len(breastType))
+
 cupSizeMapping={}
 braSizeMapping={}
 breastMapping={}
@@ -86,8 +83,13 @@ def updateCsvFile(row):
 
 #Columns to consider
 def parseRow(row):
+    print("Hello")
     rawList=[]
 
+    #Name
+    name=row[0]
+    rawList.append(name)
+    print(rawList)
     # Height
     height=float(row[7])
     rawList.append(height)
@@ -95,6 +97,7 @@ def parseRow(row):
     #Body Mass
     mass=float(row[8])
     rawList.append(mass)
+    print(rawList)
 
     BWHRatio=row[3].split('-')
     breast=float(BWHRatio[0])
@@ -114,6 +117,8 @@ def parseRow(row):
     BW=calculateRatio(breast,waist)
     BWH=calculateRatio(BW,hip)
     rawList.append(BWH)
+    print("BWH")
+    print(rawList)
 
     #B:W
     BW=calculateRatio(breast,waist)
@@ -142,10 +147,9 @@ def parseRow(row):
     rawList.append(bsi)
 
     #Feet
-    if float(row[4]) is None:
-        rawList.append(0)
-    else:
-        rawList.append(float(row[4]))
+    print("Feet")
+    rawList.append(float(row[4]))
+    print(rawList)
    
     #Cup Size
     value=row[6]
@@ -157,7 +161,7 @@ def parseRow(row):
     else:
         for i in cupSize:
             rawList.append(int(i))
-    
+    print(rawList)
 
     #Bra Size
     value=row[5]
@@ -179,16 +183,18 @@ def parseRow(row):
     else:
         for z in breastType:
             rawList.append(int(z))
-            
+    print(rawList)
     updateCsvFile(rawList)
     
 
 def parseInputDatafile():
     try:
+        print(inputFilePath)
         with open(inputFilePath) as f:
             reader = csv.reader(f)
-            first_row = next(reader)
+            # first_row = next(reader)
             for row in reader:
+                print(row)
                 if len(row[0])!=0:
                     parseRow(row)
     except IOError as e:
