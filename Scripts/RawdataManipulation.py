@@ -1,8 +1,9 @@
-import csv
+
 import os
 import sys
 import math
 import urllib
+import csv
 import pandas as pd
 from numpy import array
 from numpy import argmax
@@ -83,13 +84,10 @@ def updateCsvFile(row):
 
 #Columns to consider
 def parseRow(row):
-    print("Hello")
     rawList=[]
-
     #Name
     name=row[0]
     rawList.append(name)
-    print(rawList)
     # Height
     height=float(row[7])
     rawList.append(height)
@@ -97,7 +95,6 @@ def parseRow(row):
     #Body Mass
     mass=float(row[8])
     rawList.append(mass)
-    print(rawList)
 
     BWHRatio=row[3].split('-')
     breast=float(BWHRatio[0])
@@ -117,8 +114,6 @@ def parseRow(row):
     BW=calculateRatio(breast,waist)
     BWH=calculateRatio(BW,hip)
     rawList.append(BWH)
-    print("BWH")
-    print(rawList)
 
     #B:W
     BW=calculateRatio(breast,waist)
@@ -147,9 +142,7 @@ def parseRow(row):
     rawList.append(bsi)
 
     #Feet
-    print("Feet")
     rawList.append(float(row[4]))
-    print(rawList)
    
     #Cup Size
     value=row[6]
@@ -161,7 +154,6 @@ def parseRow(row):
     else:
         for i in cupSize:
             rawList.append(int(i))
-    print(rawList)
 
     #Bra Size
     value=row[5]
@@ -183,28 +175,27 @@ def parseRow(row):
     else:
         for z in breastType:
             rawList.append(int(z))
-    print(rawList)
     updateCsvFile(rawList)
     
 
 def parseInputDatafile():
     try:
-        print(inputFilePath)
+        filename=outputFilePath+'/'+'output.csv'
         with open(inputFilePath) as f:
             reader = csv.reader(f)
             first_row = next(reader)
             for row in reader:
-                print(row)
-                if len(row[0])!=0:
+                if len(row)!=0:
                     parseRow(row)
     except IOError as e:
         print("I/O error({0}): {1}".format(e.errno, e.strerror))
     except: #handle other exceptions such as attribute errors
         print("Unexpected error:", sys.exc_info()[0])
 
+print("Starting.......")
 init()
 parseInputDatafile()
-print("Done")
+print("Finished!")
 
 
 
