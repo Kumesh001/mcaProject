@@ -3,14 +3,17 @@ import os
 import requests
 import validators
 import urllib2
+import urllib
 from PIL import Image
 import sys
 downloadCounter=0
 downloadFailCounter=0
 
 # Set the directory where you want to save your photos
-save_path='G:\MCA Project\data\ImagesCollected\Skirt'
-fileNotDownloadedPath='G:/MCA Project/data/ImagesCollected/Skirt/NotDownloaded'
+save_path='D:/others/MCA/Top'
+fileName="Brie_Larson"
+walkDir='D:/others/MCA/TopToDownloads'
+fileNotDownloadedPath='D:/others/MCA/Pants/Gwen Stefani/Images/NotDownloaded'
 
 def checkImageValid(filename):
     try:
@@ -21,27 +24,19 @@ def checkImageValid(filename):
         print ("?")
         os.remove(filename)
 
-def getDataFromUrl(url):
+def getDataFromUrl(url,foldername):
     try:
         res=validators.url(url)
         if res!='none':
             filename = url.split('/')[-1]
-            r = requests.get(url, allow_redirects=True)
-            if r.status_code==200:
-                filePath=os.path.join(save_path,filename)   
-                tempFile=open(filePath, 'wb')
-                tempFile.write(r.content)
-                global downloadCounter
-                downloadCounter+=1
-                print('Download Count %d and Download Fail Count is %d' %(downloadCounter, downloadFailCounter))
-            else:
-                global downloadFailCounter
-                downloadFailCounter+=1
-                filePath=fileNotDownloadedPath+'/notDownloadedPhotoUrls.txt'
-                f=open(filePath,"a")
-                message=save_path.split("\'")[-1]+',Url: '+url
-                f.write(message+"\n")
-                print "Unable to download"
+            global downloadCounter
+            downloadCounter+=1
+            try:
+                filePath=os.path.join(save_path+'/'+foldername,str(foldername)+"_"+str(downloadCounter)+".jpg") 
+                urllib.urlretrieve(url, filePath)
+                print("Image Saved")
+            except Exception as e:
+                print e
         else:
             print "Invalid"
     except (IOError, SyntaxError) as e:
@@ -50,23 +45,25 @@ def getDataFromUrl(url):
 
 def printFileContent():
     # Change the dir path for each folder separately
-    for root, directories, filenames in os.walk('G:\MCA Project\celebrityImages\TempFolder'):
+    for root, directories, filenames in os.walk(walkDir):
         for directory in directories:
             directory_path = os.path.join(root, directory)
         
         for filename in filenames:
-            print filename
+            currentDir=os.getcwd()
             file_path = os.path.join(root,filename)
-            print file_path
             if(os.path.isfile(file_path)):
                 try:
+                    dirname=file_path.split('/')[-1].split('\\')[1]
                     openFile=open(file_path,'r').readlines()
+                    if os.path.exists(save_path):
+                        os.mkdir(save_path+'/'+dirname)
+                        print("Created Folder")
+                    else:
+                        print("Failed creating Folder")
+                    # print dirname
                     for line in openFile:
-                        line=line.split(",")[1].split(":")
-                        line=line[1]+":"+line[2]
-                        print line
-                        # line=line.rstrip().split('?')[0]
-                        getDataFromUrl(line)
+                        getDataFromUrl(line,dirname)
                 except IOError as e:
                     print "I/O error({0}): {1}".format(e.errno, e.strerror)
             else:
@@ -115,11 +112,11 @@ def deleteDuplicateFiles():
 def main():
     printFileContent()
     print "Download Completed"
-    # print "Deleting the Corrupt Files"
-    # deleteCorruptFiles()
-    # print "Deleting the Duplicate Files"
-    # deleteDuplicateFiles()
-    # print "Process Done"
+    print "Deleting the Corrupt Files"
+    deleteCorruptFiles()
+    print "Deleting the Duplicate Files"
+    deleteDuplicateFiles()
+    print "Process Done"
     
 if __name__=="__main__":
     main()
